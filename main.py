@@ -42,29 +42,51 @@ class App:
     def __init__(self):
         self.triangles = np.array([
             # Front face
-            [[-1, -1, 1, 1], [1, -1, 1, 1], [1, 1, 1, 1], 1],
-            [[-1, -1, 1, 1], [1, 1, 1, 1], [-1, 1, 1, 1], 2],
+            [[-1, -1, 1, 1], [1, -1, 1, 1], [1, 3, 1, 1]],
+            [[-1, -1, 1, 1], [1, 3, 1, 1], [-1, 3, 1, 1]],
             # Back face
-            [[-1, -1, -1, 1], [1, -1, -1, 1], [1, 1, -1, 1], 3],
-            [[-1, -1, -1, 1], [1, 1, -1, 1], [-1, 1, -1, 1], 4],
+            [[-1, -1, -1, 1], [1, -1, -1, 1], [1, 1, -1, 1]],
+            [[-1, -1, -1, 1], [1, 3, -1, 1], [-1, 3, -1, 1]],
             # Left face
-            [[-1, -1, -1, 1], [-1, -1, 1, 1], [-1, 1, 1, 1], 5],
-            [[-1, -1, -1, 1], [-1, 1, 1, 1], [-1, 1, -1, 1], 6],
+            [[-1, -1, -1, 1], [-1, -1, 1, 1], [-1, 3, 1, 1]],
+            [[-1, -1, -1, 1], [-1, 3, 1, 1], [-1, 3, -1, 1]],
             # Right face
-            [[1, -1, -1, 1], [1, -1, 1, 1], [1, 1, 1, 1], 7],
-            [[1, -1, -1, 1], [1, 1, 1, 1], [1, 1, -1, 1], 8],
+            [[1, -1, -1, 1], [1, -1, 1, 1], [1, 3, 1, 1]],
+            [[1, -1, -1, 1], [1, 3, 1, 1], [1, 3, -1, 1]],
             # Top face
-            [[-1, 1, -1, 1], [1, 1, -1, 1], [1, 1, 1, 1], 9],
-            [[-1, 1, -1, 1], [1, 1, 1, 1], [-1, 1, 1, 1], 10],
+            [[-1, 3, -1, 1], [1, 3, -1, 1], [1, 3, 1, 1]],
+            [[-1, 3, -1, 1], [1, 3, 1, 1], [-1, 3, 1, 1]],
             # Bottom face
-            [[-1, -1, -1, 1], [1, -1, -1, 1], [1, -1, 1, 1], 11],
-            [[-1, -1, -1, 1], [1, -1, 1, 1], [-1, -1, 1, 1], 12]
+            [[-1, -1, -1, 1], [1, -1, -1, 1], [1, -1, 1, 1]],
+            [[-1, -1, -1, 1], [1, -1, 1, 1], [-1, -1, 1, 1]],
+
+            [[-6, -1, 1, 1], [-4, -1, 1, 1], [-4, 3, 1, 1]],
+            [[-6, -1, 1, 1], [-4, 3, 1, 1], [-6, 3, 1, 1]],
+            # Back face
+            [[-6, -1, -1, 1], [-4, -1, -1, 1], [-4, 1, -1, 1]],
+            [[-6, -1, -1, 1], [-4, 3, -1, 1], [-6, 3, -1, 1]],
+            # Left face
+            [[-6, -1, -1, 1], [-6, -1, 1, 1], [-6, 3, 1, 1]],
+            [[-6, -1, -1, 1], [-6, 3, 1, 1], [-6, 3, -1, 1]],
+            # Right face
+            [[-4, -1, -1, 1], [-4, -1, 1, 1], [-4, 3, 1, 1]],
+            [[-4, -1, -1, 1], [-4, 3, 1, 1], [-4, 3, -1, 1]],
+            # Top face
+            [[-6, 3, -1, 1], [-4, 3, -1, 1], [-4, 3, 1, 1]],
+            [[-6, 3, -1, 1], [-4, 3, 1, 1], [-6, 3, 1, 1]],
+            # Bottom face
+            [[-6, -1, -1, 1], [-4, -1, -1, 1], [-4, -1, 1, 1]],
+            [[-6, -1, -1, 1], [-4, -1, 1, 1], [-6, -1, 1, 1]]
         ])
 
-        self.camera = np.array([-3.0, 0.0, 0.0])
-        self.at = np.array([1.0, 1.0, 0.0])
+        self.color = [
+            1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2
+        ]
 
-        self.yaw = 0
+        self.camera = np.array([3.0, 1.0, 0.0])
+        self.at = np.array([-1.0, 1.0, 0.0])
+
+        self.yaw = 180
         self.pitch = 0
 
         pyxel.init(256, 256)
@@ -76,23 +98,26 @@ class App:
         rad_yaw = radians(self.yaw)
         rad_pitch = radians(self.pitch)
 
-        if pyxel.btn(pyxel.KEY_Z):
+        if pyxel.btn(pyxel.KEY_Z):  # Move forward
             self.camera[0] += cos(rad_yaw) * speed
             self.camera[2] += sin(rad_yaw) * speed
-        if pyxel.btn(pyxel.KEY_S):
+
+        if pyxel.btn(pyxel.KEY_S):  # Move backward
             self.camera[0] -= cos(rad_yaw) * speed
             self.camera[2] -= sin(rad_yaw) * speed
-        if pyxel.btn(pyxel.KEY_Q):
-            self.camera[0] += sin(rad_yaw) * speed
-            self.camera[2] += cos(rad_yaw) * speed
-        if pyxel.btn(pyxel.KEY_D):
+
+        if pyxel.btn(pyxel.KEY_Q):  # Strafe left
             self.camera[0] -= sin(rad_yaw) * speed
+            self.camera[2] += cos(rad_yaw) * speed
+
+        if pyxel.btn(pyxel.KEY_D):  # Strafe right
+            self.camera[0] += sin(rad_yaw) * speed
             self.camera[2] -= cos(rad_yaw) * speed
 
         if pyxel.btn(pyxel.KEY_M):
-            self.yaw += 1
-        if pyxel.btn(pyxel.KEY_J):
             self.yaw -= 1
+        if pyxel.btn(pyxel.KEY_J):
+            self.yaw += 1
         if pyxel.btn(pyxel.KEY_I):
             self.pitch += 1
         if pyxel.btn(pyxel.KEY_K):
@@ -102,51 +127,39 @@ class App:
 
     def draw(self):
         pyxel.cls(0)
-
-        self.depthBuffer = [[0 for x in range(256)] for y in range(256)]
         
         WorldToView = WorldToViewMatrice(self.camera, self.at)
         ViewToClip = ViewToClipMatrice(60, 1)
         ViewToScreen = ClipToScreenMatrice(256, 256)
         TransformMatrix = ViewToClip @ WorldToView
 
-        for t in self.triangles:
-            c = t[3]
+        TRIGO = []
+        for c, t in zip(self.color, self.triangles):
             p1, p2, p3 = TransformMatrix @ t[0], TransformMatrix @ t[1], TransformMatrix @ t[2]
             p1, p2, p3 = p1 / p1[3], p2 / p2[3], p3 / p3[3]
+            
+            if not ((1 >= p1[0] >= -1 and
+                    1 >= p1[1] >= -1 and
+                    1 >= p1[2] >= -1) or
+                    (1 >= p2[0] >= -1 and
+                    1 >= p2[1] >= -1 and
+                    1 >= p2[2] >= -1) or
+                    (1 >= p3[0] >= -1 and
+                    1 >= p3[1] >= -1 and
+                    1 >= p3[2] >= -1 )):
+                continue
 
             p1, p2, p3 = ViewToScreen @ p1, ViewToScreen @ p2, ViewToScreen @ p3
 
-            self.tri(p1[0], p1[1], p2[0], p2[1], p3[0], p3[1], c)
+            TRIGO.append((p1, p2, p3, c))
+
+        TRIGO.sort(key=lambda pl : max(pl[0][2], pl[1][2], pl[2][2]), reverse=True)
+
+        for p1, p2, p3, c in TRIGO:
+            pyxel.tri(p1[0], p1[1], p2[0], p2[1], p3[0], p3[1], c)
 
         pyxel.text(0, 0, f"Camera: {self.camera}", 6)
         pyxel.text(0, 10, f"Yaw: {self.yaw} | Pitch: {self.pitch}", 6)
         pyxel.text(0, 20, f"At: {self.at}", 6)
-
-    def inTriangle(self, x, y, p1x, p1y, p2x, p2y, p3x, p3y):
-        # Calculate barycentric coordinates
-        denom = (p2y - p3y) * (p1x - p3x) + (p3x - p2x) * (p1y - p3y)
-        if denom == 0:
-            return False  # The triangle vertices are collinear
-
-        lambda1 = ((p2y - p3y) * (x - p3x) + (p3x - p2x) * (y - p3y)) / denom
-        lambda2 = ((p3y - p1y) * (x - p3x) + (p1x - p3x) * (y - p3y)) / denom
-        lambda3 = 1 - lambda1 - lambda2
-
-        return 0 <= lambda1 <= 1 and 0 <= lambda2 <= 1 and  0 <= lambda3 <= 1
-
-    def tri(self, p1x, p1y, p2x, p2y, p3x, p3y, c):
-        maxX = int(max(p1x, p2x, p3x)) + 1
-        minX = int(min(p1x, p2x, p3x))
-        maxY = int(max(p1y, p2y, p3y)) + 1
-        minY = int(min(p1y, p2y, p3y))
-
-        print(maxX, minX, maxY, minY)
-
-        for x in range(minX, maxX):
-            for y in range(minY, maxY):
-                if self.inTriangle(x, y, p1x, p1y, p2x, p2y, p3x, p3y):
-                    self.depthBuffer[y][x] = 0
-                    pyxel.pset(x, y, c)
 
 App()
