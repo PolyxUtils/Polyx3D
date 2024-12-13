@@ -78,7 +78,7 @@ class App:
             [[-6, -1, -1, 1], [-4, -1, -1, 1], [-4, -1, 1, 1]],
             [[-6, -1, -1, 1], [-4, -1, 1, 1], [-6, -1, 1, 1]]
         ])
-
+        
         self.color = [
             1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2
         ]
@@ -95,24 +95,29 @@ class App:
     def update(self):
         speed = 0.1
 
+        old_pose = self.camera.copy()
+
         rad_yaw = radians(self.yaw)
         rad_pitch = radians(self.pitch)
 
         if pyxel.btn(pyxel.KEY_Z):  # Move forward
             self.camera[0] += cos(rad_yaw) * speed
             self.camera[2] += sin(rad_yaw) * speed
-
         if pyxel.btn(pyxel.KEY_S):  # Move backward
             self.camera[0] -= cos(rad_yaw) * speed
             self.camera[2] -= sin(rad_yaw) * speed
-
         if pyxel.btn(pyxel.KEY_Q):  # Strafe left
             self.camera[0] -= sin(rad_yaw) * speed
             self.camera[2] += cos(rad_yaw) * speed
-
         if pyxel.btn(pyxel.KEY_D):  # Strafe right
             self.camera[0] += sin(rad_yaw) * speed
             self.camera[2] -= cos(rad_yaw) * speed
+            
+            
+        if pyxel.btn(pyxel.KEY_SPACE):
+            self.camera[1] += 0.2
+        
+        self.shift = pyxel.btn(pyxel.KEY_SHIFT)
 
         if pyxel.btn(pyxel.KEY_M):
             self.yaw -= 1
@@ -123,17 +128,26 @@ class App:
         if pyxel.btn(pyxel.KEY_K):
             self.pitch -= 1
 
+        if self.camera[1] >= 1.05:
+            self.camera[1] -= 0.05
+        else:
+            self.camera[1] = 1
+
         self.at = np.array([cos(rad_yaw) * cos(rad_pitch), sin(rad_pitch), sin(rad_yaw) * cos(rad_pitch)]) + self.camera
 
     def draw(self):
         pyxel.cls(0)
+        
+        if self.shift:
+            self.camera[1] -= 0.5
+            self.at[1] -= 0.5
         
         WorldToView = WorldToViewMatrice(self.camera, self.at)
         ViewToClip = ViewToClipMatrice(60, 1)
         ViewToScreen = ClipToScreenMatrice(256, 256)
         TransformMatrix = ViewToClip @ WorldToView
 
-        TRIGO = []
+        trianglesToShow = []
         for c, t in zip(self.color, self.triangles):
             p1, p2, p3 = TransformMatrix @ t[0], TransformMatrix @ t[1], TransformMatrix @ t[2]
             p1, p2, p3 = p1 / p1[3], p2 / p2[3], p3 / p3[3]
@@ -151,15 +165,11 @@ class App:
 
             p1, p2, p3 = ViewToScreen @ p1, ViewToScreen @ p2, ViewToScreen @ p3
 
-            TRIGO.append((p1, p2, p3, c))
+            trianglesToShow.append((p1, p2, p3, c))
 
-        TRIGO.sort(key=lambda pl : max(pl[0][2], pl[1][2], pl[2][2]), reverse=True)
+        trianglesToShow.sort(key=lambda pl : max(pl[0][2], pl[1][2], pl[2][2]), reverse=True)
 
-        for p1, p2, p3, c in TRIGO:
+        for p1, p2, p3, c in trianglesToShow:
             pyxel.tri(p1[0], p1[1], p2[0], p2[1], p3[0], p3[1], c)
-
-        pyxel.text(0, 0, f"Camera: {self.camera}", 6)
-        pyxel.text(0, 10, f"Yaw: {self.yaw} | Pitch: {self.pitch}", 6)
-        pyxel.text(0, 20, f"At: {self.at}", 6)
 
 App()
